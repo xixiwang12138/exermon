@@ -18,7 +18,7 @@ func processResponse(ctx *gin.Context, err error, res any) {
 		})
 	} else {
 		xl := xlog.FromGin(ctx)
-		xl.Error("server process err: ", err.Error())
+		xl.Error("Server process err: ", err.Error())
 		ctx.JSON(200, gin.H{
 			"code": 500,
 			"msg":  err.Error(),

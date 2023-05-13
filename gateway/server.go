@@ -1,8 +1,8 @@
 package gateway
 
 import (
-	"exermon/gateway/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/xixiwang12138/exermon/gateway/middleware"
 	"os"
 	"os/signal"
 	"sync/atomic"
@@ -12,16 +12,22 @@ import (
 	"github.com/xixiwang12138/xlog"
 )
 
-type Option func(*server)
+type ResponseProcessor func(ctx *gin.Context, err error, res any)
+
+var (
+	DefaultMiddlewares = []gin.HandlerFunc{gin.Recovery()}
+)
+
+type Option func(*Server)
 
 var (
 	WithPort = func(port string) Option {
-		return func(s *server) {
+		return func(s *Server) {
 			s.port = port
 		}
 	}
 	WithSSL = func(keyPath, certPath string) Option {
-		return func(s *server) {
+		return func(s *Server) {
 			s.cert = &struct {
 				key  string
 				cert string
@@ -30,38 +36,33 @@ var (
 	}
 
 	WithServer = func(group map[string]func(g *gin.RouterGroup)) Option {
-		return func(s *server) {
+		return func(s *Server) {
 			s.group = group
 		}
 	}
 
 	WithGloabMiddlewares = func(fs ...gin.HandlerFunc) Option {
-		return func(s *server) {
+		return func(s *Server) {
 			s.globalMiddlewares = append(s.globalMiddlewares, fs...)
 		}
 	}
 
 	WithGrafully = func() Option {
-		return func(s *server) {
+		return func(s *Server) {
+			s.globalMiddlewares = append(s.globalMiddlewares, Grateful)
 			s.grateful = true
 		}
 	}
 
 	WithResponseProcessor = func(p ResponseProcessor) Option {
-		return func(s *server) {
+		return func(s *Server) {
 			//s.responseHandler = p
 			responseHandler = p
 		}
 	}
 )
 
-type ResponseProcessor func(ctx *gin.Context, err error, res any)
-
-var (
-	DefaultMiddlewares = []gin.HandlerFunc{gin.Recovery(), Grateful()}
-)
-
-type server struct {
+type Server struct {
 	g *gin.Engine
 
 	group             map[string]func(*gin.RouterGroup)
@@ -77,18 +78,28 @@ type server struct {
 	grateful bool
 }
 
-func (server *server) init() {
+func NewServer(options ...Option) *Server {
+	s := &Server{}
+	s.g = gin.New()
+
+	for _, option := range options {
+		option(s)
+	}
+	return s
+}
+
+func (server *Server) init() {
 	gin.SetMode(gin.ReleaseMode)
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {}
 	server.g = gin.New()
 	server.responseHandler = responseHandler
 }
 
-func (server *server) RegisterGlobalMiddleWare(middles ...gin.HandlerFunc) {
+func (server *Server) RegisterGlobalMiddleWare(middles ...gin.HandlerFunc) {
 	server.g.Use(middles...)
 }
 
-func (server *server) RegisterMiddleWare(middle gin.HandlerFunc) {
+func (server *Server) RegisterMiddleWare(middle gin.HandlerFunc) {
 	server.g.Use(middle)
 }
 
@@ -103,7 +114,7 @@ func exist(filePath string) bool {
 	return false
 }
 
-func (server *server) start() {
+func (server *Server) start() {
 	ssl := server.cert
 	//HTTPS启动
 	if ssl != nil && exist(ssl.key) && exist(ssl.cert) {
@@ -120,13 +131,13 @@ func (server *server) start() {
 	}
 }
 
-func (server *server) Setup() {
+func (server *Server) Start() {
 	server.init()
 	server.RegisterGlobalMiddleWare()
 	server.registerGroups()
 	go server.start()
 	if server.grateful {
-		//grateful stop server
+		//grateful stop Server
 		c := make(chan os.Signal)
 		signal.Notify(c, syscall.SIGTERM, syscall.SIGINT)
 		select {
@@ -139,9 +150,10 @@ func (server *server) Setup() {
 			}
 		}
 	}
+	select {}
 }
 
-func (server *server) registerGroups() {
+func (server *Server) registerGroups() {
 	if server.group == nil {
 		return
 	}
@@ -150,7 +162,7 @@ func (server *server) registerGroups() {
 	}
 }
 
-func (server *server) registerGroup(groupPrefix string, registerFunc func(g *gin.RouterGroup)) {
+func (server *Server) registerGroup(groupPrefix string, registerFunc func(g *gin.RouterGroup)) {
 	group := server.g.Group(groupPrefix)
 	registerFunc(group)
 }
@@ -159,19 +171,17 @@ var (
 	stop int64 = 0
 )
 
-func Grateful() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		if stopped := atomic.LoadInt64(&stop); stopped == 1 {
-			c.JSON(404, gin.H{"msg": "服务维护中，请稍后再试"})
-			c.Abort()
-			return
-		}
-		c.Next()
+func Grateful(c *gin.Context) {
+	if stopped := atomic.LoadInt64(&stop); stopped == 1 {
+		c.JSON(404, gin.H{"msg": "服务维护中，请稍后再试"})
+		c.Abort()
 		return
 	}
+	c.Next()
+	return
 }
 
-func (server *server) Close() {
+func (server *Server) Close() {
 	atomic.AddInt64(&stop, 1)
-	xlog.Info("gateway server stop handle request....")
+	xlog.Info("gateway Server stop handle request....")
 }

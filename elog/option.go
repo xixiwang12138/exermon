@@ -18,8 +18,20 @@ func SetConfig(level LogLevel, logDir string) {
 }
 
 func WithContext(ctx context.Context) *Logger {
+	v := ctx.Value(TraceIdHeader)
+	s := "empty"
+	if _, ok := v.(string); ok {
+		s = v.(string)
+	}
 	return &Logger{
 		BaseLogger: base,
-		traceId:    ctx.Value(TraceIdHeader).(string),
+		traceId:    s,
+	}
+}
+
+func WithTraceId(traceId string) *Logger {
+	return &Logger{
+		BaseLogger: base,
+		traceId:    traceId,
 	}
 }

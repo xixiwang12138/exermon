@@ -1,0 +1,24 @@
+[mysql]
+user_name = ""
+password = ""
+address = ""
+port = "8080"
+db_name = ""
+
+
+[http]
+port = ":8081"
+
+[redis]
+address = ""
+password = ""
+db = 0
+
+
+[ssl]
+key = "/home/web/xx.key"
+cert = "/home/web/xx.cert"
+
+[file]
+upload_path = ""
+image_access_path = ""

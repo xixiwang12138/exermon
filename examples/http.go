@@ -19,6 +19,6 @@ func main() {
 	s.Start()
 }
 
-func GetUserInfo(c *gin.Context, xl context.Context, p *string) (any, error) {
+func GetUserInfo(c *gin.Context, xl context.Context, p *string) (*any, error) {
 	return nil, nil
 }

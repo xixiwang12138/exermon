@@ -1,9 +1,12 @@
 package conf
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/pelletier/go-toml/v2"
+	"gopkg.in/yaml.v2"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -34,27 +37,27 @@ const (
 
 // MySQLConfig MySQL配置信息
 type MySQLConfig struct {
-	UserName string `toml:"user_name" yaml:"user_name"`
-	Password string `toml:"password" yaml:"password"`
-	Address  string `toml:"address" yaml:"address"`
-	Port     int    `toml:"port" yaml:"port"`
-	DbName   string `toml:"db_name" yaml:"db_name"`
+	UserName string `toml:"user_name" yaml:"user_name" json:"user_name"`
+	Password string `toml:"password" yaml:"password" json:"password"`
+	Address  string `toml:"address" yaml:"address" json:"address"`
+	Port     int    `toml:"port" yaml:"port" json:"port"`
+	DbName   string `toml:"db_name" yaml:"db_name" json:"db_name"`
 }
 
-// RedisConfig Redis配置信息，注意字段名与Options保持一致
+// RedisConfig Redis配置信息
 type RedisConfig struct {
-	Addr     string `toml:"address" yaml:"addr"`
-	Password string `toml:"password" yaml:"password"`
-	DB       int    `toml:"db" yaml:"db"`
+	Addr     string `toml:"address" yaml:"addr" json:"addr"`
+	Password string `toml:"password" yaml:"password" json:"password"`
+	DB       int    `toml:"db" yaml:"db" json:"db"`
 }
 
 // Config 所有配置信息]
 type Config struct {
-	HTTP       *BaseApiConfig    `toml:"http" yaml:"http"`
-	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql"`
-	Redis      *RedisConfig      `toml:"redis" yaml:"redis"`
-	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl"`
-	FileConfig *FileUploadConfig `toml:"file" yaml:"file"`
+	HTTP       *BaseApiConfig    `toml:"http" yaml:"http" json:"http"`
+	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql" json:"mysql"`
+	Redis      *RedisConfig      `toml:"redis" yaml:"redis" json:"redis"`
+	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl" json:"ssl"`
+	FileConfig *FileUploadConfig `toml:"file" yaml:"file" json:"file"`
 }
 
 func (c *Config) check() {
@@ -62,8 +65,8 @@ func (c *Config) check() {
 }
 
 type FileUploadConfig struct {
-	UploadPath      string `toml:"upload_path" yaml:"upload_path"`
-	ImageAccessPath string `toml:"image_access_path" yaml:"image_access_path"`
+	UploadPath      string `toml:"upload_path" yaml:"upload_path" json:"upload_path"`
+	ImageAccessPath string `toml:"image_access_path" yaml:"image_access_path" json:"image_access_path"`
 }
 
 type SSLConfig struct {
@@ -90,10 +93,28 @@ type context struct {
 	env    ENVType
 }
 
-func (c *context) Setup(buffer []byte, env ENVType) {
+func (c *context) Setup(path string, cfType string, env ENVType) {
 	c.env = env
 	c.global = new(Config)
-	err := toml.Unmarshal(buffer, c.global)
+
+	getBuf := func() []byte {
+		buffer, err := os.ReadFile(path)
+		if err != nil {
+			panic(err)
+		}
+		return buffer
+	}
+
+	var err error
+
+	switch cfType {
+	case "toml":
+		err = toml.Unmarshal(getBuf(), c.global)
+	case "json":
+		err = json.Unmarshal(getBuf(), c.global)
+	case "yaml":
+		err = yaml.Unmarshal(getBuf(), c.global)
+	}
 	if err != nil {
 		log.Fatalf("[Get Config]Unmarshal toml: %v", err)
 	}

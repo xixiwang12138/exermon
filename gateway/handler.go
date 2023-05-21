@@ -1,8 +1,9 @@
 package gateway
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/xixiwang12138/xlog"
+	"github.com/xixiwang12138/exermon/elog"
 	"net/http"
 )
 
@@ -17,8 +18,8 @@ func processResponse(ctx *gin.Context, err error, res any) {
 			"data": res,
 		})
 	} else {
-		xl := xlog.FromGin(ctx)
-		xl.Error("Server process err: ", err.Error())
+		cl := elog.WithTraceId(getTraceId(ctx))
+		cl.Error("Server process err: ", err.Error())
 		ctx.JSON(200, gin.H{
 			"code": 500,
 			"msg":  err.Error(),
@@ -27,10 +28,10 @@ func processResponse(ctx *gin.Context, err error, res any) {
 }
 
 // RawHandler 只包含逻辑调用的handler，只关心参数类型，因为任意响应类型最终都会使用json序列化
-type RawHandler[P any] func(c *gin.Context, xl *xlog.XLogger, p *P) (any, error)
+type RawHandler[P any] func(c *gin.Context, ctx context.Context, p *P) (any, error)
 
 // RawNoParamHandler 只包含逻辑调用的无参数handler
-type RawNoParamHandler func(c *gin.Context, xl *xlog.XLogger) (any, error)
+type RawNoParamHandler func(c *gin.Context, ctx context.Context) (any, error)
 
 // Handler 带参数的handler包裹器
 func Handler[P any](rawFunc RawHandler[P]) gin.HandlerFunc {
@@ -39,7 +40,7 @@ func Handler[P any](rawFunc RawHandler[P]) gin.HandlerFunc {
 		var res any
 		var err error
 		if err = ctx.ShouldBind(param); err == nil {
-			res, err = rawFunc(ctx, xlog.FromGin(ctx), param)
+			res, err = rawFunc(ctx, context.WithValue(ctx, elog.TraceIdHeader, getTraceId(ctx)), param)
 		}
 		responseHandler(ctx, err, res)
 	}
@@ -50,7 +51,16 @@ func NoParamHandler(rawFunc RawNoParamHandler) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var res any
 		var err error
-		res, err = rawFunc(ctx, xlog.FromGin(ctx))
+
+		res, err = rawFunc(ctx, context.WithValue(ctx, elog.TraceIdHeader, getTraceId(ctx)))
 		responseHandler(ctx, err, res)
 	}
+}
+
+func getTraceId(ctx *gin.Context) string {
+	traceId, ok := ctx.Get(elog.TraceIdHeader)
+	if !ok {
+		traceId = elog.DefaultTrace
+	}
+	return traceId.(string)
 }

@@ -1,9 +1,9 @@
 package _examples
 
 import (
+	"context"
 	"github.com/xixiwang12138/exermon/db"
 	"github.com/xixiwang12138/exermon/db/op"
-	"github.com/xixiwang12138/xlog"
 )
 
 type User struct {
@@ -24,16 +24,14 @@ type UserService struct {
 }
 
 func NewUserService() *UserService {
-	// TODO
 	return &UserService{BaseDao: db.NewBaseDao[User](nil)}
 }
 
 // UpdateUser 不涉及事务操作
-func (u *UserService) UpdateUser(xl *xlog.XLogger, id string) (user *User, err error) {
+func (u *UserService) UpdateUser(xl context.Context, id string) (user *User, err error) {
 	// Tip1: 使用Instance方法注入context
 	instance := u.Instance(xl) //可以将BaseDao理解为一个模板，注入context后变为实例，注入之前不可进行数据库操作
 	if user, err = instance.Get(op.Eq("id", id)); err != nil {
-		xl.Error("xxx")
 		return nil, err
 	}
 
@@ -47,7 +45,7 @@ func (u *UserService) UpdateUser(xl *xlog.XLogger, id string) (user *User, err e
 }
 
 // ListUsers 列表查询
-func (u *UserService) ListUsers(xl *xlog.XLogger, limit, offset int, fuzzyName string) (users []*User, err error) {
+func (u *UserService) ListUsers(xl context.Context, limit, offset int, fuzzyName string) (users []*User, err error) {
 	instance := u.Instance(xl)
 	users, err = instance.List(
 		op.Filter(op.Like("name", fuzzyName)),
@@ -57,7 +55,7 @@ func (u *UserService) ListUsers(xl *xlog.XLogger, limit, offset int, fuzzyName s
 	return
 }
 
-func (u *UserService) DeleteUser(xl *xlog.XLogger, userId string) (err error) {
+func (u *UserService) DeleteUser(xl context.Context, userId string) (err error) {
 	tx := u.BaseDao.Begin()
 	instance := tx.Instance(xl)
 

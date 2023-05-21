@@ -1,5 +1,7 @@
 package elog
 
 const (
-	TraceIdHeader = "context_trace_id"
+	TraceIdHeader = "context-trace-id"
+
+	DefaultTrace = "default"
 )

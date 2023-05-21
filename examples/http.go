@@ -1,10 +1,9 @@
 package _examples
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/xixiwang12138/exermon/gateway"
-	"github.com/xixiwang12138/exermon/gateway/middleware"
-	"github.com/xixiwang12138/xlog"
 )
 
 func main() {
@@ -15,12 +14,11 @@ func main() {
 	}
 	s := gateway.NewServer(
 		gateway.WithServer(group),
-		gateway.WithGrafully(),
-		gateway.WithPort(":8082"),
-		gateway.WithGloabMiddlewares(middleware.Cors()))
+		gateway.WithGracefully(),
+		gateway.WithPort(":8082"))
 	s.Start()
 }
 
-func GetUserInfo(c *gin.Context, xl *xlog.XLogger, p *string) (any, error) {
+func GetUserInfo(c *gin.Context, xl context.Context, p *string) (any, error) {
 	return nil, nil
 }

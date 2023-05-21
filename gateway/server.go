@@ -15,7 +15,7 @@ import (
 type ResponseProcessor func(ctx *gin.Context, err error, res any)
 
 var (
-	DefaultMiddlewares = []gin.HandlerFunc{gin.Recovery()}
+	DefaultMiddlewares = []gin.HandlerFunc{gin.Recovery(), middleware.TracingLogger()}
 )
 
 type Option func(*Server)
@@ -41,13 +41,13 @@ var (
 		}
 	}
 
-	WithGloabMiddlewares = func(fs ...gin.HandlerFunc) Option {
+	WithGlobalMiddlewares = func(fs ...gin.HandlerFunc) Option {
 		return func(s *Server) {
 			s.globalMiddlewares = append(s.globalMiddlewares, fs...)
 		}
 	}
 
-	WithGrafully = func() Option {
+	WithGracefully = func() Option {
 		return func(s *Server) {
 			s.globalMiddlewares = append(s.globalMiddlewares, Grateful)
 			s.grateful = true
@@ -93,14 +93,7 @@ func (server *Server) init() {
 	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {}
 	server.g = gin.New()
 	server.responseHandler = responseHandler
-}
-
-func (server *Server) RegisterGlobalMiddleWare(middles ...gin.HandlerFunc) {
-	server.g.Use(middles...)
-}
-
-func (server *Server) RegisterMiddleWare(middle gin.HandlerFunc) {
-	server.g.Use(middle)
+	server.globalMiddlewares = DefaultMiddlewares
 }
 
 func exist(filePath string) bool {
@@ -133,7 +126,7 @@ func (server *Server) start() {
 
 func (server *Server) Start() {
 	server.init()
-	server.RegisterGlobalMiddleWare()
+	server.g.Use(server.globalMiddlewares...)
 	server.registerGroups()
 	go server.start()
 	if server.grateful {

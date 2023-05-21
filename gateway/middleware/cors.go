@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/xixiwang12138/xlog"
 	"net/http"
 )
 
@@ -29,13 +28,6 @@ func Cors() gin.HandlerFunc {
 		if method == "OPTIONS" {
 			c.JSON(http.StatusOK, "ok!")
 		}
-
-		defer func() {
-			xl := xlog.FromGin(c)
-			if err := recover(); err != nil {
-				xl.Stack("panic err: ", err)
-			}
-		}()
 		c.Next()
 	}
 }

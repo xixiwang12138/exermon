@@ -34,27 +34,27 @@ const (
 
 // MySQLConfig MySQL配置信息
 type MySQLConfig struct {
-	UserName string `toml:"user_name"`
-	Password string `toml:"password"`
-	Address  string `toml:"address"`
-	Port     string `toml:"port"`
-	DbName   string `toml:"db_name"`
+	UserName string `toml:"user_name" yaml:"user_name"`
+	Password string `toml:"password" yaml:"password"`
+	Address  string `toml:"address" yaml:"address"`
+	Port     int    `toml:"port" yaml:"port"`
+	DbName   string `toml:"db_name" yaml:"db_name"`
 }
 
 // RedisConfig Redis配置信息，注意字段名与Options保持一致
 type RedisConfig struct {
-	Addr     string `toml:"address"`
-	Password string `toml:"password"`
-	DB       int    `toml:"db"`
+	Addr     string `toml:"address" yaml:"addr"`
+	Password string `toml:"password" yaml:"password"`
+	DB       int    `toml:"db" yaml:"db"`
 }
 
 // Config 所有配置信息]
 type Config struct {
-	HTTP       *BaseApiConfig    `toml:"http"`
-	Mysql      *MySQLConfig      `toml:"mysql"`
-	Redis      *RedisConfig      `toml:"redis"`
-	SSL        *SSLConfig        `toml:"ssl"`
-	FileConfig *FileUploadConfig `toml:"file"`
+	HTTP       *BaseApiConfig    `toml:"http" yaml:"http"`
+	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql"`
+	Redis      *RedisConfig      `toml:"redis" yaml:"redis"`
+	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl"`
+	FileConfig *FileUploadConfig `toml:"file" yaml:"file"`
 }
 
 func (c *Config) check() {
@@ -62,8 +62,8 @@ func (c *Config) check() {
 }
 
 type FileUploadConfig struct {
-	UploadPath      string `toml:"upload_path"`
-	ImageAccessPath string `toml:"image_access_path"`
+	UploadPath      string `toml:"upload_path" yaml:"upload_path"`
+	ImageAccessPath string `toml:"image_access_path" yaml:"image_access_path"`
 }
 
 type SSLConfig struct {

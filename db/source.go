@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"github.com/xixiwang12138/exermon/conf"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -32,14 +33,14 @@ type RdsClient struct {
 	pool int
 }
 
-func NewRdsClient(port int, userName, password, address, database string, options ...Option) *RdsClient {
+func NewRdsClient(cf conf.MySQLConfig, options ...Option) *RdsClient {
 	c := &RdsClient{connect: &struct {
 		UserName string
 		Password string
 		Address  string
 		Port     int
 		Database string
-	}{UserName: userName, Password: password, Address: address, Port: port, Database: database}}
+	}{UserName: cf.UserName, Password: cf.Password, Address: cf.Address, Port: cf.Port, Database: cf.DbName}}
 	for _, option := range options {
 		option(c)
 	}

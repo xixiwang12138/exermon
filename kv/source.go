@@ -3,6 +3,7 @@ package kv
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
+	"github.com/xixiwang12138/exermon/conf"
 	"log"
 	"time"
 )
@@ -18,13 +19,13 @@ type RedisClient struct {
 	Client *redis.Client
 }
 
-func NewRedisClient(addr, password string, db int, options ...Option) *RedisClient {
+func NewRedisClient(cf conf.RedisConfig, options ...Option) *RedisClient {
 	c := &RedisClient{
 		connect: struct {
 			Address  string
 			Password string
 			DB       int
-		}{Address: addr, Password: password, DB: db}}
+		}{Address: cf.Addr, Password: cf.Password, DB: cf.DB}}
 	for _, option := range options {
 		option(c)
 	}

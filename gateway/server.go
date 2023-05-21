@@ -112,12 +112,12 @@ func (server *Server) start() {
 	//HTTPS启动
 	if ssl != nil && exist(ssl.key) && exist(ssl.cert) {
 		server.g.Use(middleware.TlsHandler(server.port))
-		cl.Info("[HTTPS] ===> HTTPS", server.port)
+		cl.Info("[HTTPS] ===> HTTPS： %s", server.port)
 		if err := server.g.RunTLS(server.port, ssl.cert, ssl.key); err != nil {
 			panic(err)
 		}
 	} else {
-		cl.Info("[HTTP] CERT FILE NOT EXIST ===> HTTP: ", &server.port, "\n\n")
+		cl.Info("[HTTP] CERT FILE NOT EXIST ===> HTTP: %s", server.port)
 		if err := server.g.Run(server.port); err != nil {
 			panic(err)
 		}

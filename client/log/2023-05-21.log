@@ -1,0 +1,36 @@
+[test][2023-05-21 23:25:34][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:26:19][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:26:19][DEBUG] http.go:129  post error: Get "http://43.139.80.71:8081/api//": http: ContentLength=4 with Body length 0, tryTimes left: 4
+[test][2023-05-21 23:28:04][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:28:04][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:28:04][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:28:05][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:28:05][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:28:05][DEBUG] http.go:145  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:29:36][DEBUG] http.go:93  begin request: GET http://43.139.80.71:8081/api//
+[test][2023-05-21 23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:29:36][DEBUG] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][INFO] http.go:93  begin request: GET http://43.139.80.71:8081/api//
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+[test][2023-05-21 23:31:21][WARNING] http.go:144  do request error, status: 404 Not Found, begin retry
+
+[test][2023-05-21 23:34:35][INFO] http.go:94  begin request: GET http://43.139.80.71:8081/api//
+[test][2023-05-21 23:34:35][ERROR] http.go:144  client error, no need retry, status: 404 Not Found
+[test][23:47:30][INFO] http.go:94begin request: GET http://43.139.80.71:8081/api//
+[test][23:47:30][ERROR] http.go:144client error, no need retry, status: 404 Not Found
+[test][05-21 23:49:10][INFO] http.go:94 begin request: GET http://43.139.80.71:8081/api//
+[test][05-21 23:49:10][ERROR] http.go:144 client error, no need retry, status: 404 Not Found
+[test][23:50:40 000][INFO] http.go:94 begin request: GET http://43.139.80.71:8081/api//
+[test][23:50:41 000][ERROR] http.go:144 client error, no need retry, status: 404 Not Found
+[test][23:52:57 1684684377214][INFO] http.go:94 begin request: GET http://43.139.80.71:8081/api//
+[test][23:52:57 1684684377280][ERROR] http.go:144 client error, no need retry, status: 404 Not Found
+[test][23:55:52.370][INFO] http.go:94 begin request: GET http://43.139.80.71:8081/api//
+[test][23:55:52.455][ERROR] http.go:144 client error, no need retry, status: 404 Not Found

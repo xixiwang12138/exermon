@@ -3,6 +3,8 @@ package elog
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -16,12 +18,12 @@ const (
 	FATAL
 )
 
-var logLevelNames = map[LogLevel]string{
-	DEBUG:   "DEBUG",
-	INFO:    "INFO",
-	WARNING: "WARNING",
-	ERROR:   "ERROR",
-	FATAL:   "FATAL",
+var logLevelNames = map[LogLevel][]byte{
+	DEBUG:   []byte("DEBUG"),
+	INFO:    []byte("INFO"),
+	WARNING: []byte("WARN"),
+	ERROR:   []byte("ERROR"),
+	FATAL:   []byte("FATAL"),
 }
 
 //var logLevelColors = map[LogLevel]string{
@@ -64,7 +66,26 @@ func (l *Logger) log(level LogLevel, format string, args ...interface{}) {
 	}
 	now := time.Now()
 	file, line := l.getCaller()
-	logStr := fmt.Sprintf("[%s][%s][%s] %s:%d  ", l.traceId, now.Format("2006-01-02 15:04:05"), logLevelNames[l.getLevel()], file, line)
+	logStr := l.getPrefix(level, file, strconv.Itoa(line))
 	logStr += fmt.Sprintf(format, args...)
 	l.writeToFile(logStr, now)
+}
+
+func (l *Logger) getPrefix(level LogLevel, file, line string) string {
+	now := time.Now()
+	sb := strings.Builder{}
+	sb.Grow(64)
+	sb.WriteString("[")
+	sb.WriteString(l.traceId)
+	sb.WriteString("][")
+	sb.WriteString(now.Format("15:04:05.000"))
+	sb.WriteString("][")
+	sb.Write(logLevelNames[level])
+	sb.WriteString("]")
+	sb.WriteString(" ")
+	sb.WriteString(file)
+	sb.WriteString(":")
+	sb.WriteString(line)
+	sb.WriteString(" ")
+	return sb.String()
 }

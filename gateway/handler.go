@@ -28,13 +28,13 @@ func processResponse(ctx *gin.Context, err error, res any) {
 }
 
 // RawHandler 只包含逻辑调用的handler，只关心参数类型，因为任意响应类型最终都会使用json序列化
-type RawHandler[P any] func(c *gin.Context, ctx context.Context, p *P) (any, error)
+type RawHandler[P any, R any] func(c *gin.Context, ctx context.Context, p *P) (*R, error)
 
 // RawNoParamHandler 只包含逻辑调用的无参数handler
-type RawNoParamHandler func(c *gin.Context, ctx context.Context) (any, error)
+type RawNoParamHandler[R any] func(c *gin.Context, ctx context.Context) (*R, error)
 
 // Handler 带参数的handler包裹器
-func Handler[P any](rawFunc RawHandler[P]) gin.HandlerFunc {
+func Handler[P any, R any](rawFunc RawHandler[P, R]) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		param := new(P)
 		var res any
@@ -47,7 +47,7 @@ func Handler[P any](rawFunc RawHandler[P]) gin.HandlerFunc {
 }
 
 // NoParamHandler 无参handler包裹器
-func NoParamHandler(rawFunc RawNoParamHandler) gin.HandlerFunc {
+func NoParamHandler[R any](rawFunc RawNoParamHandler[R]) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var res any
 		var err error

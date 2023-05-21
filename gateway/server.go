@@ -2,14 +2,13 @@ package gateway
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/xixiwang12138/exermon/elog"
 	"github.com/xixiwang12138/exermon/gateway/middleware"
 	"os"
 	"os/signal"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"github.com/xixiwang12138/xlog"
 )
 
 type ResponseProcessor func(ctx *gin.Context, err error, res any)
@@ -109,15 +108,16 @@ func exist(filePath string) bool {
 
 func (server *Server) start() {
 	ssl := server.cert
+	cl := elog.WithTraceId("start")
 	//HTTPS启动
 	if ssl != nil && exist(ssl.key) && exist(ssl.cert) {
 		server.g.Use(middleware.TlsHandler(server.port))
-		xlog.Info("[HTTPS] ===> HTTPS", server.port)
+		cl.Info("[HTTPS] ===> HTTPS", server.port)
 		if err := server.g.RunTLS(server.port, ssl.cert, ssl.key); err != nil {
 			panic(err)
 		}
 	} else {
-		xlog.Info("[HTTP] CERT FILE NOT EXIST ===> HTTP: ", &server.port, "\n\n")
+		cl.Info("[HTTP] CERT FILE NOT EXIST ===> HTTP: ", &server.port, "\n\n")
 		if err := server.g.Run(server.port); err != nil {
 			panic(err)
 		}
@@ -136,7 +136,8 @@ func (server *Server) Start() {
 		select {
 		case sig := <-c:
 			{
-				xlog.Infof("Got %s signal. Waiting all requests can be handled...\n", sig)
+				cl := elog.WithTraceId("terminate")
+				cl.Info("Got %s signal. Waiting all requests can be handled...\n", sig)
 				time.Sleep(4 * time.Second) //ensure all request can be processed
 				server.Close()
 				os.Exit(1)
@@ -176,5 +177,6 @@ func Grateful(c *gin.Context) {
 
 func (server *Server) Close() {
 	atomic.AddInt64(&stop, 1)
-	xlog.Info("gateway Server stop handle request....")
+	el := elog.WithTraceId("close")
+	el.Info("gateway Server stop handle request....")
 }

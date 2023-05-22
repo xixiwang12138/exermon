@@ -113,7 +113,7 @@ func (h *HttpRPCClient) getJSONRequest(ctx context.Context, method string, url s
 	} else {
 		request.Header = header
 	}
-
+	request.Header.Set("Content-Type", "application/json")
 	return
 }
 

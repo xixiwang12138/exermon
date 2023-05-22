@@ -19,7 +19,7 @@ func processResponse(ctx *gin.Context, err error, res any) {
 		})
 	} else {
 		cl := elog.WithTraceId(getTraceId(ctx))
-		cl.Error("Server process err: ", err.Error())
+		cl.Error("Server process err: %+v", err)
 		ctx.JSON(200, gin.H{
 			"code": 500,
 			"msg":  err.Error(),

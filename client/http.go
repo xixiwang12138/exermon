@@ -73,7 +73,7 @@ func (h *HttpRPCClient) build() {
 	}
 }
 
-func (h *HttpRPCClient) JsonPost(ctx context.Context, url string, header http.Header, data any, result *any) error {
+func (h *HttpRPCClient) JsonPost(ctx context.Context, url string, header http.Header, data any, result any) error {
 	request, err := h.getJSONRequest(ctx, "POST", url, header, data)
 	if err != nil {
 		return err

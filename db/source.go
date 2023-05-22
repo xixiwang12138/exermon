@@ -63,7 +63,7 @@ func (c *RdsClient) Gorm() *gorm.DB {
 }
 
 func (c *RdsClient) AsyncRdsStruct(models ...any) {
-	err := c.db.Migrator().AutoMigrate(models)
+	err := c.db.Migrator().AutoMigrate(models...)
 	if err != nil {
 		log.Fatal("AsyncRdsStruct failed: ", err)
 	}

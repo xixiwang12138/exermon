@@ -44,18 +44,27 @@ func NewRdsClient(cf conf.MySQLConfig, options ...Option) *RdsClient {
 	for _, option := range options {
 		option(c)
 	}
+	c.Connect()
 	return c
 }
 
-func (c *RdsClient) Connect() (err error) {
+func (c *RdsClient) Connect() {
+	var err error
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.connect.UserName, c.connect.Password,
 		c.connect.Address, c.connect.Port, c.connect.Database)
 	if c.db, err = gorm.Open(mysql.Open(dsn)); err != nil { //TODO: 连接池等高级配置
 		log.Fatal("open rds connection error: ", err.Error())
 	}
-	return nil
+	return
 }
 
 func (c *RdsClient) Gorm() *gorm.DB {
 	return c.db
+}
+
+func (c *RdsClient) AsyncRdsStruct(models ...any) {
+	err := c.db.Migrator().AutoMigrate(models)
+	if err != nil {
+		log.Fatal("AsyncRdsStruct failed: ", err)
+	}
 }

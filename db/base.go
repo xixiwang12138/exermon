@@ -77,10 +77,11 @@ func (repo *BaseDao[T]) Save(t *T) (err error) {
 
 func (repo *BaseDao[T]) List(clauses ...op.Clause) (list []*T, err error) {
 	temp := repo.copy()
+	list = make([]*T, 0)
 	for _, clause := range clauses {
 		temp = clause(temp)
 	}
-	err = temp.Find(list).Error
+	err = temp.Find(&list).Error
 	return
 }
 

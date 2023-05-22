@@ -53,7 +53,7 @@ func newBaseLogger(level LogLevel, logDir string) (*BaseLogger, error) {
 }
 
 func (b *BaseLogger) lockedOpenFile(logTime time.Time) error {
-	fileName := logTime.Format("2006-01-02") + ".log"
+	fileName := logTime.Format("2006.01.02") + ".log"
 	filePath := filepath.Join(b.logDir, fileName)
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {

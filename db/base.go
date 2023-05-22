@@ -65,13 +65,13 @@ func (repo *BaseDao[T]) Instance(ctx context.Context) *BaseDao[T] {
 
 func (repo *BaseDao[T]) Insert(t *T) (err error) {
 	temp := repo.copy()
-	err = temp.Create(t).Error
+	err = temp.Create(&t).Error
 	return
 }
 
 func (repo *BaseDao[T]) Save(t *T) (err error) {
 	temp := repo.copy()
-	err = temp.Save(t).Error
+	err = temp.Save(&t).Error
 	return
 }
 
@@ -86,7 +86,7 @@ func (repo *BaseDao[T]) List(clauses ...op.Clause) (list []*T, err error) {
 
 func (repo *BaseDao[T]) Get(filter ...*op.Condition) (r *T, err error) {
 	temp := repo.wrap(filter...)
-	err = temp.First(r).Error
+	err = temp.First(&r).Error
 	return
 }
 

@@ -6,7 +6,10 @@ import (
 )
 
 var (
-	base *BaseLogger
+	base *BaseLogger = &BaseLogger{
+		level:  DEBUG,
+		logDir: "./log",
+	}
 )
 
 func SetConfig(level LogLevel, logDir string) {

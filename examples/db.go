@@ -40,7 +40,7 @@ func (u *UserService) UpdateUser(xl context.Context, id string) (user *User, err
 	}
 
 	// Tip2: 这里可以直接使用实例
-	err = instance.Save(user)
+	err = instance.Save(user, op.Eq("id", id))
 	return nil, err
 }
 

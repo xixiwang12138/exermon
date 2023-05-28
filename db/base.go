@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/xixiwang12138/exermon/db/op"
 	"gorm.io/gorm"
-	"os"
 )
 
 type Transaction *gorm.DB
@@ -70,8 +69,8 @@ func (repo *BaseDao[T]) Insert(t *T) (err error) {
 	return
 }
 
-func (repo *BaseDao[T]) Save(t *T) (err error) {
-	temp := repo.copy()
+func (repo *BaseDao[T]) Save(t *T, filter ...*op.Condition) (err error) {
+	temp := repo.wrap(filter...)
 	err = temp.Save(t).Error
 	return
 }
@@ -109,10 +108,6 @@ func (repo *BaseDao[T]) Update(v map[string]any, filter ...*op.Condition) (err e
 	temp := repo.wrap(filter...)
 	err = temp.Updates(v).Error
 	return
-}
-
-func Do() {
-	println(os.Getwd())
 }
 
 // endregion

@@ -3,13 +3,23 @@ package elog
 import (
 	"context"
 	"log"
+	"os"
 )
 
-var (
-	base *BaseLogger = &BaseLogger{
+func init() {
+	log.SetOutput(WithTraceId("default"))
+	base = &BaseLogger{
 		level:  DEBUG,
 		logDir: "./log",
 	}
+	prefix, _ = os.Getwd()
+	prefixLen = len(prefix)
+}
+
+var (
+	base      *BaseLogger
+	prefix    string
+	prefixLen int
 )
 
 func SetConfig(level LogLevel, logDir string) {
@@ -22,7 +32,7 @@ func SetConfig(level LogLevel, logDir string) {
 
 func WithContext(ctx context.Context) *Logger {
 	v := ctx.Value(TraceIdHeader)
-	s := "empty"
+	s := "default"
 	if _, ok := v.(string); ok {
 		s = v.(string)
 	}

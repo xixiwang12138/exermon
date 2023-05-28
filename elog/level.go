@@ -39,6 +39,14 @@ type Logger struct {
 	traceId string
 }
 
+func (l *Logger) Write(p []byte) (n int, err error) {
+	err = l.writeToFile(string(p), time.Now())
+	if err != nil {
+		return 0, err
+	}
+	return len(p), nil
+}
+
 func (l *Logger) Debug(format string, args ...interface{}) {
 	l.log(DEBUG, format, args...)
 }
@@ -68,24 +76,35 @@ func (l *Logger) log(level LogLevel, format string, args ...interface{}) {
 	file, line := l.getCaller()
 	logStr := l.getPrefix(level, file, strconv.Itoa(line))
 	logStr += fmt.Sprintf(format, args...)
-	l.writeToFile(logStr, now)
+	_ = l.writeToFile(logStr, now)
 }
+
+const (
+	left  byte = '['
+	right byte = ']'
+	black byte = ' '
+	colon byte = ':'
+)
+
+var (
+	rightAndleft []byte = []byte("][")
+)
 
 func (l *Logger) getPrefix(level LogLevel, file, line string) string {
 	now := time.Now()
 	sb := strings.Builder{}
 	sb.Grow(64)
-	sb.WriteString("[")
+	sb.WriteByte(left)
 	sb.WriteString(l.traceId)
-	sb.WriteString("][")
+	sb.Write(rightAndleft)
 	sb.WriteString(now.Format("15:04:05.000"))
-	sb.WriteString("][")
+	sb.Write(rightAndleft)
 	sb.Write(logLevelNames[level])
-	sb.WriteString("]")
-	sb.WriteString(" ")
+	sb.WriteByte(right)
+	sb.WriteByte(black)
 	sb.WriteString(file)
-	sb.WriteString(":")
+	sb.WriteByte(colon)
 	sb.WriteString(line)
-	sb.WriteString(" ")
+	sb.WriteByte(black)
 	return sb.String()
 }

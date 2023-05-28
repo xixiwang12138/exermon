@@ -89,7 +89,10 @@ func NewServer(options ...Option) *Server {
 
 func (server *Server) init() {
 	gin.SetMode(gin.ReleaseMode)
-	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {}
+	gin.DebugPrintRouteFunc = func(httpMethod, absolutePath, handlerName string, nuHandlers int) {
+		el := elog.WithTraceId("start")
+		el.Info("%-6s %-25s --> %s (%d handlers)\n", httpMethod, absolutePath, handlerName, nuHandlers)
+	}
 	server.g = gin.New()
 	server.responseHandler = responseHandler
 	server.globalMiddlewares = DefaultMiddlewares

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/xixiwang12138/exermon/db/op"
 	"gorm.io/gorm"
+	"os"
 )
 
 type Transaction *gorm.DB
@@ -108,6 +109,10 @@ func (repo *BaseDao[T]) Update(v map[string]any, filter ...*op.Condition) (err e
 	temp := repo.wrap(filter...)
 	err = temp.Updates(v).Error
 	return
+}
+
+func Do() {
+	println(os.Getwd())
 }
 
 // endregion

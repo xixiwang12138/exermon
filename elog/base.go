@@ -66,12 +66,13 @@ func (b *BaseLogger) lockedOpenFile(logTime time.Time) error {
 	return nil
 }
 
-func (b *BaseLogger) writeToFile(logStr string, logTime time.Time) {
+func (b *BaseLogger) writeToFile(logStr string, logTime time.Time) error {
 	b.tryOpenNewFile(logTime)
 	_, err := b.geFile().WriteString(logStr + "\n")
 	if err != nil {
 		fmt.Println("Failed to write log", err)
 	}
+	return err
 }
 
 func dayIntFlag(t time.Time) int32 {
@@ -92,5 +93,5 @@ func (b *BaseLogger) tryOpenNewFile(logTime time.Time) {
 
 func (b *BaseLogger) getCaller() (string, int) {
 	_, file, line, _ := runtime.Caller(3)
-	return filepath.Base(file), line
+	return file[prefixLen+1:], line //+1 ==> trim "/"
 }

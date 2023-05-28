@@ -3,6 +3,7 @@ package db
 import (
 	"fmt"
 	"github.com/xixiwang12138/exermon/conf"
+	"github.com/xixiwang12138/exermon/elog"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
@@ -55,6 +56,7 @@ func (c *RdsClient) Connect() {
 	if c.db, err = gorm.Open(mysql.Open(dsn)); err != nil { //TODO: 连接池等高级配置
 		log.Fatal("open rds connection error: ", err.Error())
 	}
+	c.db.Logger = &elog.GormLogger
 	return
 }
 

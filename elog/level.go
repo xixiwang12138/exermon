@@ -87,7 +87,7 @@ const (
 )
 
 var (
-	rightAndleft []byte = []byte("][")
+	rightAndLeft []byte = []byte("][")
 )
 
 func (l *Logger) getPrefix(level LogLevel, file, line string) string {
@@ -96,9 +96,9 @@ func (l *Logger) getPrefix(level LogLevel, file, line string) string {
 	sb.Grow(64)
 	sb.WriteByte(left)
 	sb.WriteString(l.traceId)
-	sb.Write(rightAndleft)
+	sb.Write(rightAndLeft)
 	sb.WriteString(now.Format("15:04:05.000"))
-	sb.Write(rightAndleft)
+	sb.Write(rightAndLeft)
 	sb.Write(logLevelNames[level])
 	sb.WriteByte(right)
 	sb.WriteByte(black)

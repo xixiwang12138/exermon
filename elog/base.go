@@ -93,5 +93,5 @@ func (b *BaseLogger) tryOpenNewFile(logTime time.Time) {
 
 func (b *BaseLogger) getCaller() (string, int) {
 	_, file, line, _ := runtime.Caller(3)
-	return file[prefixLen+1:], line //+1 ==> trim "/"
+	return file, line
 }

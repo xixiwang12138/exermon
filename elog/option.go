@@ -3,17 +3,14 @@ package elog
 import (
 	"context"
 	"log"
-	"os"
 )
 
 func init() {
-	log.SetOutput(WithTraceId("default"))
 	base = &BaseLogger{
 		level:  DEBUG,
 		logDir: "./log",
 	}
-	prefix, _ = os.Getwd()
-	prefixLen = len(prefix)
+	log.SetOutput(WithTraceId("default"))
 }
 
 var (

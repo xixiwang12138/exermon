@@ -1,13 +1,14 @@
 package conf
 
 import (
+	"log"
+	"strconv"
+	"strings"
+
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"github.com/xixiwang12138/exermon/elog"
-	"strconv"
-	"strings"
 )
 
 type nacosSource struct {
@@ -24,8 +25,7 @@ func (c *nacosSource) ListenConf(env ENVType, onChange func(config *Config)) {
 			if string(env) != dataId || group != c.group || namespace != c.namespace {
 				return
 			}
-			el := elog.WithTraceId("nacos")
-			el.Info("nacos config changed: " + data)
+			log.Println("nacos config changed: " + data)
 			conf, err := UnmarshalConf(data)
 			if err != nil {
 				panic(err)

@@ -110,4 +110,10 @@ func (repo *BaseDao[T]) Update(v map[string]any, filter ...*op.Condition) (err e
 	return
 }
 
+func (repo *BaseDao[T]) UpdateByFiledMask(t *T, fields []string, filter ...*op.Condition) (err error) {
+	temp := repo.wrap(filter...)
+	err = temp.Select(fields).Updates(t).Error
+	return
+}
+
 // endregion

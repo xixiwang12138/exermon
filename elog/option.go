@@ -2,6 +2,7 @@ package elog
 
 import (
 	"context"
+	"github.com/xixiwang12138/exermon/conf"
 	"log"
 )
 
@@ -14,13 +15,12 @@ func init() {
 }
 
 var (
-	base      *BaseLogger
-	prefix    string
-	prefixLen int
+	base *BaseLogger
 )
 
-func SetConfig(level LogLevel, logDir string) {
-	l, err := newBaseLogger(level, logDir)
+// Setup level可配置: DEBUG, INFO, WARN, ERROR, FATAL
+func Setup(cf *conf.LogConfig) {
+	l, err := newBaseLogger(logNameToLevel[cf.Level], cf.DirPath)
 	if err != nil {
 		log.Fatal("init log context error", err.Error())
 	}

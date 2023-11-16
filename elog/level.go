@@ -13,26 +13,26 @@ type LogLevel int
 const (
 	DEBUG LogLevel = iota
 	INFO
-	WARNING
+	WARN
 	ERROR
 	FATAL
 )
 
-var logLevelNames = map[LogLevel][]byte{
-	DEBUG:   []byte("DEBUG"),
-	INFO:    []byte("INFO"),
-	WARNING: []byte("WARN"),
-	ERROR:   []byte("ERROR"),
-	FATAL:   []byte("FATAL"),
+var logLevelToName = map[LogLevel][]byte{
+	DEBUG: []byte("DEBUG"),
+	INFO:  []byte("INFO"),
+	WARN:  []byte("WARN"),
+	ERROR: []byte("ERROR"),
+	FATAL: []byte("FATAL"),
 }
 
-//var logLevelColors = map[LogLevel]string{
-//	DEBUG:   "\033[34m", // Blue
-//	INFO:    "\033[32m", // Green
-//	WARNING: "\033[33m", // Yellow
-//	ERROR:   "\033[31m", // Red
-//	FATAL:   "\033[35m", // Magenta
-//}
+var logNameToLevel = map[string]LogLevel{
+	"DEBUG": DEBUG,
+	"INFO":  INFO,
+	"WARN":  WARN,
+	"ERROR": ERROR,
+	"FATAL": FATAL,
+}
 
 type Logger struct {
 	*BaseLogger
@@ -56,7 +56,7 @@ func (l *Logger) Info(format string, args ...interface{}) {
 }
 
 func (l *Logger) Warning(format string, args ...interface{}) {
-	l.log(WARNING, format, args...)
+	l.log(WARN, format, args...)
 }
 
 func (l *Logger) Error(format string, args ...interface{}) {
@@ -99,7 +99,7 @@ func (l *Logger) getPrefix(level LogLevel, file, line string) string {
 	sb.Write(rightAndLeft)
 	sb.WriteString(now.Format("15:04:05.000"))
 	sb.Write(rightAndLeft)
-	sb.Write(logLevelNames[level])
+	sb.Write(logLevelToName[level])
 	sb.WriteByte(right)
 	sb.WriteByte(black)
 	sb.WriteString(file)

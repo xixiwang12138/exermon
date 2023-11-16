@@ -13,8 +13,7 @@ import (
 )
 
 var (
-	DefaultHeader http.Header = nil
-	NoBody        *any        = nil
+	NoBody *any = nil
 )
 
 type Option func(client *HttpRPCClient)

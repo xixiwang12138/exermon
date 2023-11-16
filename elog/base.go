@@ -13,7 +13,7 @@ import (
 
 type BaseLogger struct {
 	level      LogLevel     //日志等级
-	logDir     string       //输入的日志文件夹路径
+	logDir     string       //输出的日志文件夹路径
 	file       *os.File     //文件描述符
 	currentDay atomic.Int32 // 20220110, use atomic
 
@@ -32,7 +32,7 @@ func (b *BaseLogger) getLevel() LogLevel {
 	return b.level
 }
 
-func (b *BaseLogger) geFile() *os.File {
+func (b *BaseLogger) getFile() *os.File {
 	b.mutex.Lock()
 	defer b.mutex.Unlock()
 	return b.file
@@ -68,7 +68,7 @@ func (b *BaseLogger) lockedOpenFile(logTime time.Time) error {
 
 func (b *BaseLogger) writeToFile(logStr string, logTime time.Time) error {
 	b.tryOpenNewFile(logTime)
-	_, err := b.geFile().WriteString(logStr + "\n")
+	_, err := b.getFile().WriteString(logStr + "\n")
 	if err != nil {
 		fmt.Println("Failed to write log", err)
 	}

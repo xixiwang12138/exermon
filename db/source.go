@@ -9,6 +9,9 @@ import (
 	"log"
 )
 
+// Component 数据库组件
+var Component *RdsClient
+
 type Option func(*RdsClient) *RdsClient
 
 var (
@@ -23,7 +26,7 @@ var (
 type RdsClient struct {
 	db *gorm.DB
 
-	connect *struct {
+	callee *struct {
 		UserName string
 		Password string
 		Address  string
@@ -34,8 +37,8 @@ type RdsClient struct {
 	pool int
 }
 
-func NewRdsClient(cf conf.MySQLConfig, options ...Option) *RdsClient {
-	c := &RdsClient{connect: &struct {
+func Setup(cf *conf.MySQLConfig, options ...Option) {
+	Component = &RdsClient{callee: &struct {
 		UserName string
 		Password string
 		Address  string
@@ -43,16 +46,15 @@ func NewRdsClient(cf conf.MySQLConfig, options ...Option) *RdsClient {
 		Database string
 	}{UserName: cf.UserName, Password: cf.Password, Address: cf.Address, Port: cf.Port, Database: cf.DbName}}
 	for _, option := range options {
-		option(c)
+		option(Component)
 	}
-	c.Connect()
-	return c
+	Component.Connect()
 }
 
 func (c *RdsClient) Connect() {
 	var err error
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.connect.UserName, c.connect.Password,
-		c.connect.Address, c.connect.Port, c.connect.Database)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", c.callee.UserName, c.callee.Password,
+		c.callee.Address, c.callee.Port, c.callee.Database)
 	if c.db, err = gorm.Open(mysql.Open(dsn)); err != nil { //TODO: 连接池等高级配置
 		log.Fatal("open rds connection error: ", err.Error())
 	}
@@ -64,9 +66,9 @@ func (c *RdsClient) Gorm() *gorm.DB {
 	return c.db
 }
 
-func (c *RdsClient) AsyncRdsStruct(models ...any) {
+func (c *RdsClient) SyncRdsStruct(models ...any) {
 	err := c.db.Migrator().AutoMigrate(models...)
 	if err != nil {
-		log.Fatal("AsyncRdsStruct failed: ", err)
+		log.Fatal("SyncRdsStruct failed: ", err)
 	}
 }

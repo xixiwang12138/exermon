@@ -18,8 +18,6 @@ func processResponse(ctx *gin.Context, err error, res any) {
 			"data": res,
 		})
 	} else {
-		cl := elog.WithTraceId(getTraceId(ctx))
-		cl.Error("Server process err: %+v", err)
 		ctx.JSON(200, gin.H{
 			"code": 500,
 			"msg":  err.Error(),
@@ -36,11 +34,20 @@ type RawNoParamHandler[R any] func(c *gin.Context, ctx context.Context) (*R, err
 // Handler 带参数的handler包裹器
 func Handler[P any, R any](rawFunc RawHandler[P, R]) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		c := context.WithValue(ctx, elog.TraceIdHeader, getTraceId(ctx))
+		el := elog.WithContext(c)
 		param := new(P)
 		var res any
 		var err error
 		if err = ctx.ShouldBind(param); err == nil {
-			res, err = rawFunc(ctx, context.WithValue(ctx, elog.TraceIdHeader, getTraceId(ctx)), param)
+			req := ctx.Request
+			el.Debug("[Request]%s %s || [Param] %+v", req.Method, req.URL.String(), param)
+			res, err = rawFunc(ctx, c, param)
+			if err != nil {
+				el.Error("[Response Error] %+v, err: +%v", res, err)
+			} else {
+				el.Debug("[Response Success] %+v", res)
+			}
 		}
 		responseHandler(ctx, err, res)
 	}

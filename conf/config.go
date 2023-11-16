@@ -1,33 +1,13 @@
 package conf
 
 import (
-	"encoding/json"
-	"github.com/gin-gonic/gin"
-	"github.com/pelletier/go-toml/v2"
-	"gopkg.in/yaml.v2"
 	"log"
-	"os"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-// env 配置
-
-func Global() *Config {
-	return Context.global
-}
-
-func ENV() ENVType {
-	return Context.env
-}
-
 type ENVType string
-
-func (e ENVType) Test() bool {
-	if e == TEST || e == DEV {
-		return true
-	}
-	return false
-}
 
 const (
 	PROD ENVType = "prod"
@@ -51,13 +31,20 @@ type RedisConfig struct {
 	DB       int    `toml:"db" yaml:"db" json:"db"`
 }
 
-// Config 所有配置信息]
+// LogConfig 日志配置信息
+type LogConfig struct {
+	Level   string `toml:"level" yaml:"level" json:"level"`
+	DirPath string `toml:"dir_path" yaml:"dir_path" json:"dir_path"`
+}
+
+// Config 所有配置信息
 type Config struct {
 	HTTP       *BaseApiConfig    `toml:"http" yaml:"http" json:"http"`
 	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql" json:"mysql"`
 	Redis      *RedisConfig      `toml:"redis" yaml:"redis" json:"redis"`
 	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl" json:"ssl"`
 	FileConfig *FileUploadConfig `toml:"file" yaml:"file" json:"file"`
+	LogConfig  *LogConfig        `toml:"log" yaml:"log" json:"log"`
 }
 
 func (c *Config) check() {
@@ -83,39 +70,5 @@ type BaseApiConfig struct {
 func (c BaseApiConfig) check() {
 	if !strings.HasPrefix(c.PORT, ":") {
 		log.Fatalf("http listen port should start with : ,but now is %s \n", c.PORT)
-	}
-}
-
-var Context = &context{}
-
-type context struct {
-	global *Config
-	env    ENVType
-}
-
-func (c *context) Setup(path string, cfType string, env ENVType) {
-	c.env = env
-	c.global = new(Config)
-
-	getBuf := func() []byte {
-		buffer, err := os.ReadFile(path)
-		if err != nil {
-			panic(err)
-		}
-		return buffer
-	}
-
-	var err error
-
-	switch cfType {
-	case "toml":
-		err = toml.Unmarshal(getBuf(), c.global)
-	case "json":
-		err = json.Unmarshal(getBuf(), c.global)
-	case "yaml":
-		err = yaml.Unmarshal(getBuf(), c.global)
-	}
-	if err != nil {
-		log.Fatalf("[Get Config]Unmarshal toml: %v", err)
 	}
 }

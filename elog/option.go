@@ -6,14 +6,6 @@ import (
 	"log"
 )
 
-func init() {
-	base = &BaseLogger{
-		level:  DEBUG,
-		logDir: "./log",
-	}
-	log.SetOutput(WithTraceId("default"))
-}
-
 var (
 	base *BaseLogger
 )

@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -40,6 +41,7 @@ func (c *nacosSource) ReadConf(env ENVType) *Config {
 		DataId: string(env),
 		Group:  "DEFAULT_GROUP",
 	})
+	fmt.Println(str)
 	if err != nil {
 		panic("Read Conf Error: " + err.Error())
 	}

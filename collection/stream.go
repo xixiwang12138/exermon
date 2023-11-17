@@ -17,3 +17,12 @@ func Filter[T any](list []T, retainFunc func(T) bool) []T {
 	}
 	return ans
 }
+
+func GroupBy[T any, K comparable](list []T, keyFunc func(T) K) map[K][]T {
+	ans := make(map[K][]T)
+	for _, e := range list {
+		k := keyFunc(e)
+		ans[k] = append(ans[k], e)
+	}
+	return ans
+}

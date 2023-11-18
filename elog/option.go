@@ -7,16 +7,22 @@ import (
 )
 
 var (
-	base *BaseLogger
+	base         *BaseLogger
+	silentLogger *BaseLogger
 )
 
 // Setup level可配置: DEBUG, INFO, WARN, ERROR, FATAL
 func Setup(cf *conf.LogConfig) {
-	l, err := newBaseLogger(logNameToLevel[cf.Level], cf.DirPath)
+	var err error
+	base, err = newBaseLogger(logNameToLevel[cf.Level], cf.DirPath)
 	if err != nil {
 		log.Fatal("init log context error", err.Error())
 	}
-	base = l
+
+	silentLogger, err = newBaseLogger(SILENT, cf.DirPath)
+	if err != nil {
+		log.Fatal("init log context error", err.Error())
+	}
 }
 
 func WithContext(ctx context.Context) *Logger {
@@ -24,6 +30,19 @@ func WithContext(ctx context.Context) *Logger {
 	s := "default"
 	if _, ok := v.(string); ok {
 		s = v.(string)
+	}
+
+	v2 := ctx.Value(TraceLogEnableHeader)
+	logEnable := 0
+	if _, ok := v2.(int); ok {
+		logEnable = v2.(int)
+	}
+
+	if logEnable == silence {
+		return &Logger{
+			BaseLogger: silentLogger,
+			traceId:    s,
+		}
 	}
 	return &Logger{
 		BaseLogger: base,
@@ -36,4 +55,10 @@ func WithTraceId(traceId string) *Logger {
 		BaseLogger: base,
 		traceId:    traceId,
 	}
+}
+
+const silence = 1
+
+func SilenceLogCtx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, TraceLogEnableHeader, silence)
 }

@@ -11,7 +11,8 @@ import (
 type LogLevel int
 
 const (
-	DEBUG LogLevel = iota
+	SILENT LogLevel = iota
+	DEBUG
 	INFO
 	WARN
 	ERROR

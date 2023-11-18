@@ -33,7 +33,7 @@ func WithContext(ctx context.Context) *Logger {
 	}
 
 	v2 := ctx.Value(TraceLogEnableHeader)
-	logEnable := 0
+	logEnable := enable
 	if _, ok := v2.(int); ok {
 		logEnable = v2.(int)
 	}
@@ -57,8 +57,13 @@ func WithTraceId(traceId string) *Logger {
 	}
 }
 
+const enable = 0
 const silence = 1
 
 func SilenceLogCtx(ctx context.Context) context.Context {
 	return context.WithValue(ctx, TraceLogEnableHeader, silence)
+}
+
+func EnableLogCtx(ctx context.Context) context.Context {
+	return context.WithValue(ctx, TraceLogEnableHeader, enable)
 }

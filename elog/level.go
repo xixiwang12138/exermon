@@ -49,22 +49,27 @@ func (l *Logger) Write(p []byte) (n int, err error) {
 }
 
 func (l *Logger) Debug(format string, args ...interface{}) {
+	format, args = replaceJsonHolder(format, args)
 	l.log(DEBUG, format, args...)
 }
 
 func (l *Logger) Info(format string, args ...interface{}) {
+	format, args = replaceJsonHolder(format, args)
 	l.log(INFO, format, args...)
 }
 
 func (l *Logger) Warning(format string, args ...interface{}) {
+	format, args = replaceJsonHolder(format, args)
 	l.log(WARN, format, args...)
 }
 
 func (l *Logger) Error(format string, args ...interface{}) {
+	format, args = replaceJsonHolder(format, args)
 	l.log(ERROR, format, args...)
 }
 
 func (l *Logger) Fatal(format string, args ...interface{}) {
+	format, args = replaceJsonHolder(format, args)
 	l.log(FATAL, format, args...)
 	os.Exit(1)
 }

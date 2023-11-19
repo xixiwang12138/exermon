@@ -31,6 +31,7 @@ func Setup(cf *conf.RedisConfig, options ...Option) {
 	for _, option := range options {
 		option(Component)
 	}
+	Component.Connect()
 }
 
 func (c *RedisClient) Connect() {

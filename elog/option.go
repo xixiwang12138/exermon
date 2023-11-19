@@ -67,3 +67,10 @@ func SilenceLogCtx(ctx context.Context) context.Context {
 func EnableLogCtx(ctx context.Context) context.Context {
 	return context.WithValue(ctx, TraceLogEnableHeader, enable)
 }
+
+func TempSilence(ctx context.Context, f func()) context.Context {
+	ctx = SilenceLogCtx(ctx)
+	f()
+	ctx = EnableLogCtx(ctx)
+	return ctx
+}

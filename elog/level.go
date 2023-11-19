@@ -11,12 +11,12 @@ import (
 type LogLevel int
 
 const (
-	SILENT LogLevel = iota
-	DEBUG
+	DEBUG LogLevel = iota
 	INFO
 	WARN
 	ERROR
 	FATAL
+	SILENT = 100
 )
 
 var logLevelToName = map[LogLevel][]byte{

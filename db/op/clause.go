@@ -32,5 +32,10 @@ func Filter(conditions ...*Condition) Clause {
 		}
 		return db
 	}
+}
 
+func FilterMap(conditions map[string]any) Clause {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where(conditions)
+	}
 }

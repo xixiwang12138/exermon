@@ -95,7 +95,7 @@ func (server *Server) init() {
 	}
 	server.g = gin.New()
 	server.responseHandler = responseHandler
-	server.globalMiddlewares = DefaultMiddlewares
+	server.globalMiddlewares = append(DefaultMiddlewares, server.globalMiddlewares...)
 }
 
 func exist(filePath string) bool {

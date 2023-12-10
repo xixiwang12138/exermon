@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	api "github.com/hashicorp/consul/api"
 	"log"
 )
@@ -25,6 +26,7 @@ func (consul consulSource) ReadConf(env ENVType) *Config {
 	if pair == nil {
 		panic("[Consul] Read Conf Error: " + "key not found, key: " + consul.getConfKey(env))
 	}
+	fmt.Println("[Consul] Read Conf: \n", string(pair.Value))
 	conf, err := UnmarshalConf(string(pair.Value))
 	return conf
 }

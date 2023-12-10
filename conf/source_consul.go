@@ -10,6 +10,13 @@ type consulSource struct {
 	namespace string // namespace is the prefix of the key, like "quickio", normally it is the name of the project
 }
 
+func NewConsulSource(namespace, addr string) Source {
+	return consulSource{
+		c:         NewConsulClient(addr),
+		namespace: namespace,
+	}
+}
+
 func (consul consulSource) ReadConf(env ENVType) *Config {
 	pair, _, err := consul.c.KV().Get(consul.getConfKey(env), nil)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 // Component 数据库组件
@@ -59,6 +60,9 @@ func (c *RdsClient) Connect() {
 		log.Fatal("open rds connection error: ", err.Error())
 	}
 	c.db.Logger = &elog.GormLogger
+	// 连接池配置
+	sql, err := c.db.DB()
+	sql.SetConnMaxLifetime(7 * time.Hour) // 设置连接的最长存活时间，略小于mysql的超时时间
 	return
 }
 

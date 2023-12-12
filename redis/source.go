@@ -10,6 +10,10 @@ import (
 
 var Component *RedisClient
 
+const (
+	Nil = redis.Nil
+)
+
 type Option func(client *RedisClient) *RedisClient
 
 type RedisClient struct {

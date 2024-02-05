@@ -32,7 +32,6 @@ func Setup(cf *conf.RedisConfig, options ...Option) {
 			Password string
 			DB       int
 		}{Address: cf.Addr, Password: cf.Password, DB: cf.DB}}
-
 	for _, option := range options {
 		option(Component)
 	}

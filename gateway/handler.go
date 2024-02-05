@@ -11,6 +11,8 @@ var (
 	responseHandler = processResponse
 )
 
+type Empty struct{}
+
 func processResponse(ctx *gin.Context, err error, res any) {
 	if err == nil {
 		ctx.JSON(http.StatusOK, gin.H{

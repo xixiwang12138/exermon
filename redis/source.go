@@ -49,6 +49,6 @@ func (c *RedisClient) Connect() {
 	if err != nil {
 		log.Fatal("connect redis failed: ", r, err.Error())
 	}
-	log.Println("connect redis successfully!")
+	log.Println("connect redis successfully!!")
 	return
 }

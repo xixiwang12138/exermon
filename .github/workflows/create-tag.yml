@@ -27,4 +27,5 @@ jobs:
           git push origin "v$commit_id"
 
       - name: Output Tag Information
-        run: echo "Tag created and pushed: v$commit_id"
+        run: |
+          echo "Tag created and pushed: v$commit_id"

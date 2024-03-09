@@ -2,9 +2,10 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v4"
+	"time"
 )
 
-func NewAuth[T any](pk string) UserAuthService[T] {
+func NewAuth[T any](pk string, expire time.Duration) UserAuthService[T] {
 	return UserAuthService[T]{
 		pk: pk,
 	}
@@ -13,10 +14,17 @@ func NewAuth[T any](pk string) UserAuthService[T] {
 type UserAuthService[T any] struct {
 	jwt.RegisteredClaims
 	pk string
+
+	expire time.Duration
 }
 
-func (s UserAuthService[T]) GenerateToken(claim UserClaims[T]) (string, error) {
-	ss, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claim).SignedString([]byte(s.pk))
+func (s UserAuthService[T]) GenerateToken(user T) (string, error) {
+	ss, err := jwt.NewWithClaims(jwt.SigningMethodHS256, &UserClaims[T]{
+		UserPayload: user,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(s.expire)),
+		},
+	}).SignedString([]byte(s.pk))
 	if err != nil {
 		return "", err
 	}

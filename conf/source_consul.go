@@ -2,8 +2,9 @@ package conf
 
 import (
 	"fmt"
-	api "github.com/hashicorp/consul/api"
 	"log"
+
+	api "github.com/hashicorp/consul/api"
 )
 
 type consulSource struct {
@@ -27,6 +28,7 @@ func (consul consulSource) ReadConf(env ENVType) *Config {
 		panic("[Consul] Read Conf Error: " + "key not found, key: " + consul.getConfKey(env))
 	}
 	fmt.Println("[Consul] Read Conf: \n", string(pair.Value))
+	viperParser(string(pair.Value))
 	conf, err := UnmarshalConf(string(pair.Value))
 	return conf
 }

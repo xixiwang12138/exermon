@@ -7,19 +7,19 @@ import (
 	api "github.com/hashicorp/consul/api"
 )
 
-type consulSource struct {
+type consulSource[T any] struct {
 	c         *api.Client
 	namespace string // namespace is the prefix of the key, like "quickio", normally it is the name of the project
 }
 
-func NewConsulSource(namespace, addr string) Source {
-	return consulSource{
+func NewConsulSource[T any](namespace, addr string) Source[T] {
+	return consulSource[T]{
 		c:         NewConsulClient(addr),
 		namespace: namespace,
 	}
 }
 
-func (consul consulSource) ReadConf(env ENVType) *Config {
+func (consul consulSource[T]) ReadConf(env ENVType) *T {
 	pair, _, err := consul.c.KV().Get(consul.getConfKey(env), nil)
 	if err != nil {
 		panic("[Consul] Read Conf Error: " + err.Error() + ", key: " + consul.getConfKey(env))
@@ -29,15 +29,15 @@ func (consul consulSource) ReadConf(env ENVType) *Config {
 	}
 	fmt.Println("[Consul] Read Conf: \n", string(pair.Value))
 	viperParser(string(pair.Value))
-	conf, err := UnmarshalConf(string(pair.Value))
+	conf, err := UnmarshalConf[T](string(pair.Value))
 	return conf
 }
 
-func (consul consulSource) getConfKey(envType ENVType) string {
+func (consul consulSource[T]) getConfKey(envType ENVType) string {
 	return consul.namespace + "/" + string(envType)
 }
 
-func (consul consulSource) ListenConf(env ENVType, onChange func(config *Config)) {
+func (consul consulSource[T]) ListenConf(env ENVType, onChange func(config *T)) {
 	panic("[Consul] unsupport listen conf")
 }
 

@@ -9,9 +9,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func UnmarshalConf(data string) (conf *Config, err error) {
+func UnmarshalConf[T any](data string) (conf *T, err error) {
 	defer Viper.ReadConfig(strings.NewReader(data))
-	conf = new(Config)
+	conf = new(T)
 	bytes := []byte(data)
 
 	err = json.Unmarshal(bytes, conf)

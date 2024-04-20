@@ -44,7 +44,7 @@ func (c *RedisClient) Connect() {
 		Password: c.callee.Password,
 		DB:       c.callee.DB,
 	})
-	ctx, _ := context.WithTimeout(context.Background(), time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), time.Second * 10)
 	r, err := c.Client.Ping(ctx).Result()
 	if err != nil {
 		log.Fatal("connect redis failed: ", r, err.Error())

@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"github.com/xixiwang12138/exermon/db/op"
 	"gorm.io/gorm"
 )
@@ -90,10 +89,6 @@ func (repo *BaseDao[T]) Get(filter ...*op.Condition) (r *T, err error) {
 	r = new(T)
 	temp := repo.wrap(filter...)
 	err = temp.First(&r).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		err = nil
-		r = nil
-	}
 	return
 }
 

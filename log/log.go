@@ -7,6 +7,10 @@ import (
 	"strconv"
 )
 
+func InitLog(w io.Writer) {
+	slog.SetDefault(slog.New(NewDefaultContextParsedJSONHandler(w)))
+}
+
 var (
 	TraceHeader        = "exermon-trace"
 	DefaultTraceParser = func(ctx context.Context) (string, string) {

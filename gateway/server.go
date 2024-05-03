@@ -3,7 +3,10 @@ package gateway
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/xixiwang12138/exermon/elog"
+	"github.com/xixiwang12138/exermon/errors"
 	"github.com/xixiwang12138/exermon/gateway/middleware"
+	"github.com/xixiwang12138/exermon/log"
+
 	"os"
 	"os/signal"
 	"sync/atomic"
@@ -14,7 +17,7 @@ import (
 type ResponseProcessor func(ctx *gin.Context, err error, res any)
 
 var (
-	DefaultMiddlewares = []gin.HandlerFunc{gin.Recovery(), middleware.TracingLogger()}
+	DefaultMiddlewares = []gin.HandlerFunc{middleware.Cors(), log.TracingLogger(), errors.Recover()}
 )
 
 type Option func(*Server)

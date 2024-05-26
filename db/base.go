@@ -2,8 +2,10 @@ package db
 
 import (
 	"context"
-	"github.com/xixiwang12138/exermon/db/op"
+
 	"gorm.io/gorm"
+
+	"github.com/xixiwang12138/exermon/db/op"
 )
 
 type Transaction *gorm.DB
@@ -19,7 +21,14 @@ func NewBaseDao[T any](g *gorm.DB) *BaseDao[T] {
 }
 
 func (repo *BaseDao[T]) copy() *gorm.DB {
-	return repo.g.Model(repo.model).WithContext(repo.ctx)
+	var gormTx = repo.g
+
+	tx := repo.ctx.Value(txCtxKey)
+	if tx != nil {
+		gormTx = tx.(*gorm.DB)
+	}
+
+	return gormTx.Model(repo.model).WithContext(repo.ctx)
 }
 
 func (repo *BaseDao[T]) wrap(filter ...*op.Condition) *gorm.DB {

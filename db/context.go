@@ -27,5 +27,6 @@ func MustTransaction(ctx context.Context, task func(context.Context)) {
 		tx.Commit()
 	}, func(err interface{}) {
 		tx.Rollback()
+		panic(err)
 	})
 }

@@ -28,6 +28,6 @@ func init() {
 	}
 }
 
-func Generate() uint {
-	return uint(snode.Generate())
-}
+//func Generate() uint {
+//	return uint(snode.Generate())
+//}

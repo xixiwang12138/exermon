@@ -78,6 +78,13 @@ func (repo *BaseDao[T]) Insert(t *T) (err error) {
 	return
 }
 
+func (repo *BaseDao[T]) InsertMany(t []*T) (err error) {
+	temp := repo.copy()
+	sz := len(t)
+	err = temp.CreateInBatches(t, sz).Error
+	return
+}
+
 func (repo *BaseDao[T]) Save(t *T, filter ...*op.Condition) (err error) {
 	temp := repo.wrap(filter...)
 	err = temp.Save(t).Error

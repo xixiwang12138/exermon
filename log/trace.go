@@ -14,11 +14,14 @@ func TracingLogger() gin.HandlerFunc {
 		if traceId == "" {
 			traceId = uuid.New().String()
 		}
+		ctx.Header(TraceHeader, traceId)
 		start := time.Now()
 		ctx.Set(TraceHeader, traceId)
 		ctx.Next()
-		ctx.Header(TraceHeader, traceId)
 		end := time.Now()
-		slog.InfoContext(ctx, "%-12s %-30s  ===>  %dms", ctx.Request.Method, ctx.Request.RequestURI, end.UnixMilli()-start.UnixMilli())
+		slog.InfoContext(ctx, "Access Log",
+			slog.String("method", ctx.Request.Method),
+			slog.String("url", ctx.Request.RequestURI),
+			slog.Int64("cost", end.UnixMilli()-start.UnixMilli()))
 	}
 }

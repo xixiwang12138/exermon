@@ -13,7 +13,7 @@ var (
 
 var txCtxKey = struct{}{}
 
-func MustTransaction(ctx context.Context, task func(context.Context)) {
+func MustTransaction(ctx context.Context, task func(context.Context) error) (retErr error) {
 	gormDB := Component.Gorm()
 
 	tx := gormDB.Begin(&sql.TxOptions{
@@ -23,10 +23,17 @@ func MustTransaction(ctx context.Context, task func(context.Context)) {
 	ctx = context.WithValue(ctx, txCtxKey, tx)
 
 	flow.Try(func() {
-		task(ctx)
-		tx.Commit()
+		err := task(ctx)
+		if err != nil {
+			tx.Rollback()
+			retErr = err
+		} else {
+			tx.Commit()
+		}
 	}, func(err interface{}) {
 		tx.Rollback()
 		panic(err)
 	})
+
+	return
 }

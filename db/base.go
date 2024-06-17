@@ -56,6 +56,12 @@ func (repo *BaseDao[T]) Rollback() error {
 	return repo.g.Rollback().Error
 }
 
+func (repo *BaseDao[T]) Extend(tx Transaction) *BaseDao[T] {
+	return &BaseDao[T]{
+		g: tx,
+	}
+}
+
 // Extend 由事务对象继承出另一个类型的repo
 func Extend[R any](ctx context.Context, tx Transaction) *BaseDao[R] {
 	return &BaseDao[R]{g: tx, model: new(R), ctx: ctx}

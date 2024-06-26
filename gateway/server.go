@@ -1,7 +1,9 @@
 package gateway
 
 import (
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
+
 	"github.com/xixiwang12138/exermon/elog"
 	"github.com/xixiwang12138/exermon/errors"
 	"github.com/xixiwang12138/exermon/gateway/middleware"
@@ -56,6 +58,13 @@ var (
 		}
 	}
 
+	WithAutoTLS = func(domain ...string) Option {
+		return func(s *Server) {
+			s.autoTls = true
+			s.domains = domain
+		}
+	}
+
 	WithResponseProcessor = func(p ResponseProcessor) Option {
 		return func(s *Server) {
 			//s.responseHandler = p
@@ -78,6 +87,8 @@ type Server struct {
 	}
 
 	grateful bool
+	autoTls  bool
+	domains  []string
 }
 
 func NewServer(options ...Option) *Server {
@@ -116,6 +127,11 @@ func (server *Server) start() {
 	ssl := server.cert
 	cl := elog.WithTraceId("start")
 	//HTTPS启动
+	if server.autoTls {
+		if err := autotls.Run(server.g, server.domains...); err != nil {
+			panic(err)
+		}
+	}
 	if ssl != nil && exist(ssl.key) && exist(ssl.cert) {
 		server.g.Use(middleware.TlsHandler(server.port))
 		cl.Info("[HTTPS] ===> HTTPS： %s", server.port)

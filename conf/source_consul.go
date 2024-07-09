@@ -12,9 +12,9 @@ type consulSource[T any] struct {
 	namespace string // namespace is the prefix of the key, like "quickio", normally it is the name of the project
 }
 
-func NewConsulSource[T any](namespace, addr string) Source[T] {
+func NewConsulSource[T any](namespace, addr string, token string) Source[T] {
 	return consulSource[T]{
-		c:         NewConsulClient(addr),
+		c:         NewConsulClient(addr, token),
 		namespace: namespace,
 	}
 }
@@ -41,9 +41,10 @@ func (consul consulSource[T]) ListenConf(env ENVType, onChange func(config *T)) 
 	panic("[Consul] unsupport listen conf")
 }
 
-func NewConsulClient(addr string) *api.Client {
+func NewConsulClient(addr string, token string) *api.Client {
 	config := api.DefaultConfig()
 	config.Address = addr
+	config.Token = token
 	client, err := api.NewClient(config)
 	if err != nil {
 		log.Fatal("consul client error : ", err)

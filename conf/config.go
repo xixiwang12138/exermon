@@ -42,6 +42,7 @@ type Config struct {
 	HTTP       *BaseApiConfig    `toml:"http" yaml:"http" json:"http"`
 	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql" json:"mysql"`
 	Redis      *RedisConfig      `toml:"redis" yaml:"redis" json:"redis"`
+	ExtendedRedis []*RedisConfig `toml:"extended_redis" yaml:"extended_redis" json:"extended_redis"`
 	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl" json:"ssl"`
 	FileConfig *FileUploadConfig `toml:"file" yaml:"file" json:"file"`
 	LogConfig  *LogConfig        `toml:"log" yaml:"log" json:"log"`

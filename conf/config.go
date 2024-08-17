@@ -26,9 +26,12 @@ type MySQLConfig struct {
 
 // RedisConfig Redis配置信息
 type RedisConfig struct {
-	Addr     string `toml:"address" yaml:"addr" json:"addr"`
-	Password string `toml:"password" yaml:"password" json:"password"`
-	DB       int    `toml:"db" yaml:"db" json:"db"`
+	Addr       string `toml:"address" yaml:"addr" json:"addr"`
+	Password   string `toml:"password" yaml:"password" json:"password"`
+	DB         int    `toml:"db" yaml:"db" json:"db"`
+	TLS        bool   `toml:"tls" yaml:"tls" json:"tls"`
+	SNI        string `toml:"sni" yaml:"sni" json:"sni"`
+	SkipVerify bool   `toml:"skip_verify" yaml:"skip_verify" json:"skip_verify"`
 }
 
 // LogConfig 日志配置信息
@@ -39,13 +42,13 @@ type LogConfig struct {
 
 // Config 所有配置信息
 type Config struct {
-	HTTP       *BaseApiConfig    `toml:"http" yaml:"http" json:"http"`
-	Mysql      *MySQLConfig      `toml:"mysql" yaml:"mysql" json:"mysql"`
-	Redis      *RedisConfig      `toml:"redis" yaml:"redis" json:"redis"`
-	ExtendedRedis []*RedisConfig `toml:"extended_redis" yaml:"extended_redis" json:"extended_redis"`
-	SSL        *SSLConfig        `toml:"ssl" yaml:"ssl" json:"ssl"`
-	FileConfig *FileUploadConfig `toml:"file" yaml:"file" json:"file"`
-	LogConfig  *LogConfig        `toml:"log" yaml:"log" json:"log"`
+	HTTP          *BaseApiConfig    `toml:"http" yaml:"http" json:"http"`
+	Mysql         *MySQLConfig      `toml:"mysql" yaml:"mysql" json:"mysql"`
+	Redis         *RedisConfig      `toml:"redis" yaml:"redis" json:"redis"`
+	ExtendedRedis []*RedisConfig    `toml:"extended_redis" yaml:"extended_redis" json:"extended_redis"`
+	SSL           *SSLConfig        `toml:"ssl" yaml:"ssl" json:"ssl"`
+	FileConfig    *FileUploadConfig `toml:"file" yaml:"file" json:"file"`
+	LogConfig     *LogConfig        `toml:"log" yaml:"log" json:"log"`
 }
 
 func (c *Config) check() {

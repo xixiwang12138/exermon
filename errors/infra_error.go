@@ -2,19 +2,21 @@ package errors
 
 import (
 	"fmt"
-	"log/slog"
-	"runtime/debug"
-
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
+	"github.com/xixiwang12138/exermon/elog"
+	"runtime/debug"
 )
 
 var (
-	DefaultError      = &Error{Code: 100001, Desc: "系统内部错误", HTTPCode: 200}
-	NotFoundError     = &Error{Code: 100002, Desc: "资源不存在", HTTPCode: 404}
-	InvalidParamError = &Error{Code: 100003, Desc: "参数错误", HTTPCode: 400}
-	ForbiddenError    = &Error{Code: 100004, Desc: "无权限", HTTPCode: 403}
-	InfraError        = &Error{Code: 100005, Desc: "基础组件错误", HTTPCode: 500}
-	UnauthError       = &Error{Code: 100005, Desc: "用户验证失败", HTTPCode: 401}
+	DefaultError         = &Error{Code: 100001, HTTPCode: 200}
+	NotFoundError        = &Error{Code: 100002, HTTPCode: 404}
+	InvalidParamsError   = &Error{Code: 100003, HTTPCode: 400}
+	ForbiddenError       = &Error{Code: 100004, HTTPCode: 403}
+	InfraError           = &Error{Code: 100005, HTTPCode: 500}
+	UnauthError          = &Error{Code: 100006, HTTPCode: 401}
+	ServerBusyError      = &Error{Code: 100007, HTTPCode: 503}
+	TooManyRequestsError = &Error{Code: 100008, HTTPCode: 429}
 )
 
 type Error struct {
@@ -26,29 +28,39 @@ type Error struct {
 	Ori error  // 原始错误
 }
 
-func (e Error) Error() string {
+func (e *Error) Error() string {
 	return fmt.Sprintf("code: %d, msg: %s, origin: %s", e.Code, e.Msg, e.Ori)
 }
 
-func (e Error) RaiseIf(cond any, msg string, args ...any) {
+func (e *Error) RaiseWithFormatIf(cond any, msg string, args ...any) {
+	m := fmt.Sprintf(msg, args...)
+	e.RaiseIf(cond, m)
+}
+
+func (e *Error) RaiseIf(cond any, msg ...string) {
+	m := ""
+	if len(msg) > 0 {
+		m = msg[0]
+	}
+
 	switch cond.(type) {
 	case bool:
 		if cond.(bool) {
-			err := Error{
+			err := &Error{
 				Code:     e.Code,
 				Desc:     e.Desc,
 				HTTPCode: e.HTTPCode,
-				Msg:      fmt.Sprintf(msg, args...),
+				Msg:      m,
 			}
 			panic(err)
 		}
 	case error:
 		if cond != nil {
-			err := Error{
+			err := &Error{
 				Code:     e.Code,
 				Desc:     e.Desc,
 				HTTPCode: e.HTTPCode,
-				Msg:      fmt.Sprintf(msg, args...),
+				Msg:      m,
 				Ori:      cond.(error),
 			}
 			panic(err)
@@ -56,11 +68,18 @@ func (e Error) RaiseIf(cond any, msg string, args ...any) {
 	}
 }
 
+func (e *Error) RaiseIfIsError(err error, targetErr error, msg ...string) {
+	if errors.Is(err, targetErr) {
+		e.RaiseIf(err, msg...)
+	}
+}
+
 func Recover() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		defer func() {
+			el := elog.WithContext(ctx)
 			if err := recover(); err != nil {
-				if e, ok := err.(Error); ok {
+				if e, ok := err.(*Error); ok {
 					body := gin.H{
 						"code": e.Code,
 						"msg":  e.Msg,
@@ -70,11 +89,12 @@ func Recover() gin.HandlerFunc {
 						body["ori"] = e.Ori.Error()
 					}
 					ctx.AbortWithStatusJSON(e.HTTPCode, body)
-					slog.ErrorContext(ctx, "recovered", slog.Any("error", err))
+					//el.Error(ctx, "recovered", slog.Any("error", err))
 					return
 				}
-				slog.ErrorContext(ctx, "recovered", slog.Any("unexpected", err), slog.String("stack", string(debug.Stack())))
-				ctx.AbortWithStatusJSON(500, gin.H{"code": 100001, "msg": "系统内部错误", "detail": err})
+				el.Error("unexpected error: %s; stack: %s", err, string(debug.Stack()))
+				//el.Error("recovered", slog.Any("unexpected", err), slog.String("stack", string(debug.Stack())))
+				ctx.AbortWithStatusJSON(500, gin.H{"code": -1, "msg": "Unknown error", "detail": err})
 			}
 		}()
 		ctx.Next()

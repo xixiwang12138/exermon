@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const AuthUserKey = "auth_user"
+
 func NewAuth[T any](pk string, expire time.Duration) UserAuthService[T] {
 	return UserAuthService[T]{
 		pk:     pk,

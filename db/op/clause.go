@@ -28,7 +28,7 @@ func Order(clauses ...string) Clause {
 func Filter(conditions ...*Condition) Clause {
 	return func(db *gorm.DB) *gorm.DB {
 		for _, condition := range conditions {
-			db = db.Where(condition.Query, condition.Value)
+			db = db.Where(condition.Query, condition.Value...)
 		}
 		return db
 	}

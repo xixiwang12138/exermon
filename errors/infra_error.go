@@ -94,7 +94,7 @@ func Recover() gin.HandlerFunc {
 				}
 				el.Error("unexpected error: %s; stack: %s", err, string(debug.Stack()))
 				//el.Error("recovered", slog.Any("unexpected", err), slog.String("stack", string(debug.Stack())))
-				ctx.AbortWithStatusJSON(500, gin.H{"code": -1, "msg": "Unknown error", "detail": err})
+				ctx.AbortWithStatusJSON(500, gin.H{"code": -1, "desc": "Unknown error", "detail": err})
 			}
 		}()
 		ctx.Next()

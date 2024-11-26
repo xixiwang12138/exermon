@@ -16,6 +16,12 @@ func Offset(offset int) Clause {
 	}
 }
 
+func Page(page, pageSize int) Clause {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Offset((page - 1) * pageSize).Limit(pageSize)
+	}
+}
+
 func Order(clauses ...string) Clause {
 	return func(db *gorm.DB) *gorm.DB {
 		for _, clause := range clauses {

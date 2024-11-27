@@ -1,11 +1,10 @@
 package auth
 
 import (
+	"context"
 	"github.com/golang-jwt/jwt/v4"
 	"time"
 )
-
-const AuthUserKey = "auth_user"
 
 func NewAuth[T any](pk string, expire time.Duration) UserAuthService[T] {
 	return UserAuthService[T]{
@@ -52,4 +51,18 @@ func (s UserAuthService[T]) ParseToken(token string) (*T, error) {
 type UserClaims[T any] struct {
 	UserPayload T
 	jwt.RegisteredClaims
+}
+
+const AuthUserKey = "auth_user"
+
+func WrapCtxWithAuthUser(ctx context.Context, payload any) context.Context {
+	return context.WithValue(ctx, AuthUserKey, payload)
+}
+
+func GetAuthUser[T any](ctx context.Context) *T {
+	v := ctx.Value(AuthUserKey)
+	if v == nil {
+		return nil
+	}
+	return v.(*T)
 }

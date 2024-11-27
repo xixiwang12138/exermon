@@ -15,7 +15,7 @@ func wrapGinContext(ctx *gin.Context) context.Context {
 	c := context.WithValue(context.Background(), elog.TraceIdHeader, getTraceId(ctx))
 	v, ok := ctx.Get(gin.AuthUserKey)
 	if ok {
-		c = context.WithValue(c, auth.AuthUserKey, v)
+		c = auth.WrapCtxWithAuthUser(c, v)
 	}
 	return c
 }

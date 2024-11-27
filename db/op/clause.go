@@ -4,6 +4,12 @@ import "gorm.io/gorm"
 
 type Clause func(db *gorm.DB) *gorm.DB
 
+func DefaultClause() Clause {
+	return func(db *gorm.DB) *gorm.DB {
+		return db
+	}
+}
+
 func Limit(limit int) Clause {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Limit(limit)

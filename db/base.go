@@ -120,6 +120,15 @@ func (repo *BaseDao[T]) Count(filter ...*op.Condition) (count int64, err error) 
 	return
 }
 
+func (repo *BaseDao[T]) CountEx(clauses ...op.Clause) (count int64, err error) {
+	temp := repo.copy()
+	for _, clause := range clauses {
+		temp = clause(temp)
+	}
+	err = temp.Count(&count).Error
+	return
+}
+
 func (repo *BaseDao[T]) Delete(filter ...*op.Condition) (err error) {
 	temp := repo.wrap(filter...)
 	err = temp.Delete(repo.model).Error

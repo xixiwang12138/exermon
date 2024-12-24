@@ -43,7 +43,7 @@ func Ne(field string, value any) *Condition {
 
 // Like 模糊查询
 func Like(field string, value string) *Condition {
-	return binaryOp(field, "LIKE", value)
+	return binaryOp(field, "LIKE", "%"+value+"%")
 }
 
 func In(field string, value any) *Condition {

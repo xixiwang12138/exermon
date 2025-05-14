@@ -16,6 +16,9 @@ func replaceJsonHolder(format string, args []interface{}) (string, []interface{}
 	for i, node := range nodes {
 		if node.percentFormat == 'j' || node.percentFormat == 'J' {
 			sb.Write([]byte(format[beforeJsonHolderIdx:node.percentByteIndex]))
+			if len(args) <= i {
+				continue
+			}
 			jsonStr, err := json.Marshal(args[i])
 			if err != nil {
 				continue
